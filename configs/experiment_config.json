@@ -1,0 +1,5 @@
+{
+  "model": "SoftMoE",
+  "experiment": "MOOC Dropout Prediction",
+  "settings": {}
+}
