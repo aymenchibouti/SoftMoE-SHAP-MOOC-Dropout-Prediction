@@ -1,1 +1,10 @@
 # Project dependencies
+numpy
+pandas
+scikit-learn
+torch
+pytorch-tabnet
+shap
+scipy
+statsmodels
+matplotlib
