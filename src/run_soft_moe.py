@@ -1743,7 +1743,7 @@ def main():
     print(f"\n[ج1] Gate Stability Table (Table 10): λ=0.05 vs λ=0 "
           f"({n_anchored} / {n_free} fold-runs with gate data)")
     print(f"  {'Expert':20s}  {'λ=0.05 Mean':>12}  {'λ=0.05 Std':>12}  "
-          f"{'λ=0 Mean':>12}  {'λ=0 Std':>12}  {'Var reduction':>14}")
+          f"{'λ=0 Mean':>12}  {'λ=0 Std':>12}  {'Std reduction':>14}")
     print("  " + "-"*90)
     stability_rows = []
     for col, name in zip(gate_cols, expert_names):
@@ -1752,11 +1752,11 @@ def main():
         ratio = s00 / s05 if s05 > 0 else float("nan")
         print(f"  {name:20s}  {m05:12.4f}  {s05:12.4f}  {m00:12.4f}  {s00:12.4f}  {ratio:14.2f}×")
         stability_rows.append({"expert": name, "mean_lam05": m05, "std_lam05": s05,
-                                "mean_lam0": m00, "std_lam0": s00, "variance_reduction_ratio": ratio})
+                                "mean_lam0": m00, "std_lam0": s00, "std_reduction_ratio": ratio})
     stability_df = pd.DataFrame(stability_rows)
     stability_df.to_csv("gate_stability_comparison.csv", index=False)
-    mean_ratio = stability_df["variance_reduction_ratio"].mean()
-    print(f"  → Mean variance reduction: {mean_ratio:.2f}× (SHAP anchoring stabilizes gate allocation).")
+    mean_ratio = stability_df["std_reduction_ratio"].mean()
+    print(f"  → Mean std reduction: {mean_ratio:.2f}× (SHAP anchoring stabilizes gate allocation).")
     print(f"  File saved: gate_stability_comparison.csv")
 
     # ═══════════════════════════════════════════════════════════════════════
@@ -1789,7 +1789,7 @@ def main():
     ax.set_title('AUC-ROC Averaged Within Each of the Five Independent Repeats\n'
                  '(confirms improvement is not driven by a single random partition)', fontsize=11)
     ax.set_xticks(x); ax.set_xticklabels([f'Rep. {i}' for i in x])
-    ax.legend(loc='lower right', fontsize=9, framealpha=0.9)
+    ax.legend(loc='upper center', bbox_to_anchor=(0.5, -0.12), ncol=len(_MODELS_MAIN), fontsize=9, frameon=False)
     ax.set_ylim(0.74, 0.905); ax.grid(alpha=0.3, axis='y')
     plt.tight_layout()
     plt.savefig('fig_H_per_repeat_auc.png', dpi=160, bbox_inches='tight')
@@ -1803,7 +1803,7 @@ def main():
     df_free  = res_df[res_df.model == 'soft_moe_no_kl'][gate_cols].dropna().values
     fig, axes = plt.subplots(1, 3, figsize=(13, 5.5), sharey=False)
     fig.suptitle('Gate Stability Comparison: λ=0.05 (SHAP-Anchored) vs λ=0 (Free Gate)\n'
-                 'across 25 Matched CV Runs — verifies SHAP anchoring role (Table 10)', fontsize=11)
+                 'across 25 Matched CV Runs — verifies SHAP anchoring role (Table 11)', fontsize=11)
     for ax_i, (col_i, exp_lbl) in enumerate(zip(range(3), expert_labels)):
         ax = axes[ax_i]
         data_to_plot = [df_anch[:, col_i], df_free[:, col_i]]
@@ -1814,7 +1814,7 @@ def main():
         bp['boxes'][1].set_facecolor('#C44E52'); bp['boxes'][1].set_alpha(0.7)
         ax.axhline(1/N_EXPERTS, linestyle='--', color='gray', alpha=0.6, label='Uniform (0.333)')
         ratio = df_free[:, col_i].std() / max(df_anch[:, col_i].std(), 1e-9)
-        ax.set_title(f'{exp_lbl}\nVar. reduction: {ratio:.1f}×', fontsize=10)
+        ax.set_title(f'{exp_lbl}\nStd reduction: {ratio:.2f}×', fontsize=10)
         ax.set_ylabel('Mean gate weight (per fold-run)' if ax_i == 0 else '')
         ax.grid(alpha=0.3, axis='y')
         if ax_i == 0: ax.legend(fontsize=8)
@@ -1884,7 +1884,7 @@ def main():
 
         fig, axes = plt.subplots(1, 2, figsize=(13, 7))
         fig.suptitle('Cross-Fold K-Sensitivity: Clustering Quality in Surrogate Probability Space\n'
-                     f'(all {N_TOTAL_ITERS} folds × {len(K_SENSITIVITY_VALUES)} K values — Table 3)', fontsize=11)
+                     f'(all {N_TOTAL_ITERS} folds × {len(K_SENSITIVITY_VALUES)} K values — Table 4)', fontsize=11)
 
         import matplotlib.colors as mcolors
         # Silhouette heatmap (higher = better, so green)
